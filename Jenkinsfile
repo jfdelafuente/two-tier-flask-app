@@ -12,7 +12,7 @@ pipeline {
 		}
 		stage('Build Docker Image') {
 			steps {
-				sh 'docker build -t jfdelafuente/message-flask:lastest .'
+				sh 'docker build -t jfdelafuente/message-flask:$BUILD_NUMBER .'
 				echo 'Build Image Completed'
 			}
 		}
@@ -24,7 +24,7 @@ pipeline {
 		}
 		stage('Push Image to Docker Hub') {
 			steps {
-				sh 'docker push jfdelafuente/message-flask:lastest'
+				sh 'docker push jfdelafuente/message-flask:$BUILD_NUMBER'
 				echo 'Push Image Completed'
 			}
 		}
