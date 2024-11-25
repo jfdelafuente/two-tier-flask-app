@@ -6,13 +6,13 @@ pipeline {
     stages {
 		stage("Git Checkout") {
 			steps {
-				git branch: 'feature-bot', url: 'https://github.com/jfdelafuente/two-tier-flask-app.git'
+				git branch: 'master', url: 'https://github.com/jfdelafuente/two-tier-flask-app.git'
 				echo 'Git Checkout Completed'
 			}
 		}
 		stage('Build Docker Image') {
 			steps {
-				sh 'docker build -t jfdelafuente/registro-jornada:lastest .'
+				sh 'docker build -t jfdelafuente/message-flask:lastest .'
 				echo 'Build Image Completed'
 			}
 		}
@@ -24,7 +24,7 @@ pipeline {
 		}
 		stage('Push Image to Docker Hub') {
 			steps {
-				sh 'docker push jfdelafuente/registro-jornada:lastest'
+				sh 'docker push jfdelafuente/message-flask:lastest'
 				echo 'Push Image Completed'
 			}
 		}
