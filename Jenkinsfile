@@ -3,33 +3,35 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS= credentials('dockerhub_id')
     }
-    stages{
-        stage("Code"){
-            steps{
-                git url: "https://github.com/jfdelafuente/two-tier-flask-app.git", branch: "master"
-                echo 'Git Checkout Completed'
-            }
-        }
-        stage("Build & Test"){
-            steps{
-                sh "docker build . -t flaskapp"
-                echo 'Build Image Completed'
-            }
-        }
-        stage("Push to DockerHub"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                    sh "docker tag flaskapp ${env.dockerHubUser}/flaskapp:latest"
-                    sh "docker push ${env.dockerHubUser}/flaskapp:latest" 
-                }
-                echo 'Login Completed'
-            }
-        }
-        stage("Deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
-            }
-        }
-    }
+    stages {
+		stage("Git Checkout") {
+			steps {
+				git branch: 'feature-bot', url: 'https://github.com/jfdelafuente/two-tier-flask-app.git'
+				echo 'Git Checkout Completed'
+			}
+		}
+		stage('Build Docker Image') {
+			steps {
+				sh 'docker build -t jfdelafuente/registro-jornada:lastest .'
+				echo 'Build Image Completed'
+			}
+		}
+		stage('Login to Docker Hub') {
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+				echo 'Login Completed'
+			}
+		}
+		stage('Push Image to Docker Hub') {
+			steps {
+				sh 'docker push jfdelafuente/registro-jornada:lastest'
+				echo 'Push Image Completed'
+			}
+		}
+	}
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
 }
