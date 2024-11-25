@@ -1,15 +1,19 @@
 pipeline {
     agent any
-    
+    environment {
+        DOCKERHUB_CREDENTIALS= credentials('dockerhub_id')
+    }
     stages{
         stage("Code"){
             steps{
-                git url: "https://github.com/LondheShubham153/two-tier-flask-app.git", branch: "jenkins"
+                git url: "https://github.com/jfdelafuente/two-tier-flask-app.git", branch: "master"
+                echo 'Git Checkout Completed'
             }
         }
         stage("Build & Test"){
             steps{
                 sh "docker build . -t flaskapp"
+                echo 'Build Image Completed'
             }
         }
         stage("Push to DockerHub"){
@@ -19,6 +23,7 @@ pipeline {
                     sh "docker tag flaskapp ${env.dockerHubUser}/flaskapp:latest"
                     sh "docker push ${env.dockerHubUser}/flaskapp:latest" 
                 }
+                echo 'Login Completed'
             }
         }
         stage("Deploy"){
